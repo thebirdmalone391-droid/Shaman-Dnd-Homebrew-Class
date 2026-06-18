@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Shaman — Conduits of the Planes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy: #1A2238;
+    --navy-deep: #11162A;
+    --navy-light: #28335A;
+    --gold: #C9A227;
+    --gold-soft: #E0C465;
+    --violet: #5B4B8A;
+    --violet-soft: #8A78C2;
+    --parchment: #F7F3E8;
+    --parchment-dim: #EDE7D6;
+    --ink: #211D14;
+    --ink-soft: #534E3D;
+    --line: #D9D0B8;
+    --crack-grad: linear-gradient(90deg, var(--violet) 0%, var(--gold) 60%, var(--gold-soft) 100%);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--navy-deep);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== HEADER ===== */
+  .masthead{
+    background: radial-gradient(ellipse 120% 100% at 50% -10%, var(--navy-light) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+    padding: 56px 24px 0;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  .masthead::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(201,162,39,0.25) 0, transparent 60%),
+      radial-gradient(2px 2px at 75% 20%, rgba(139,120,194,0.3) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 60% 70%, rgba(201,162,39,0.2) 0, transparent 60%),
+      radial-gradient(1.5px 1.5px at 30% 80%, rgba(139,120,194,0.25) 0, transparent 60%),
+      radial-gradient(1px 1px at 90% 60%, rgba(201,162,39,0.3) 0, transparent 60%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold-soft);
+    opacity: 0.85;
+    position:relative; z-index:1;
+  }
+  .masthead h1{
+    font-family:'Spectral', serif;
+    font-weight: 600;
+    font-size: clamp(40px, 7vw, 72px);
+    color: var(--parchment);
+    margin: 10px 0 6px;
+    letter-spacing: 0.5px;
+    position:relative; z-index:1;
+  }
+  .masthead .sub{
+    font-family:'Spectral', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--violet-soft);
+    margin: 0 0 36px;
+    position:relative; z-index:1;
+  }
+
+  /* ===== TAB NAV ===== */
+  .tab-nav{
+    display:flex;
+    justify-content:center;
+    gap: 6px;
+    position: relative;
+    z-index: 2;
+    padding: 0 16px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  .tab-btn{
+    flex:1;
+    max-width: 220px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,162,39,0.18);
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    color: rgba(247,243,232,0.55);
+    font-family:'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    padding: 16px 10px 18px;
+    cursor:pointer;
+    transition: all 0.25s ease;
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    position:relative;
+  }
+  .tab-btn svg{ width:20px; height:20px; opacity:0.55; transition: opacity 0.25s ease; }
+  .tab-btn:hover{ color: rgba(247,243,232,0.85); background: rgba(255,255,255,0.05); }
+  .tab-btn:hover svg{ opacity: 0.8; }
+  .tab-btn.active{
+    background: var(--parchment);
+    color: var(--navy);
+    border-color: var(--parchment);
+  }
+  .tab-btn.active svg{ opacity:1; }
+  .tab-btn.active .tcount{ color: var(--ink-soft); }
+  .tcount{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: rgba(247,243,232,0.4);
+    letter-spacing: 0.5px;
+  }
+
+  /* the "planar crack" indicator */
+  .crack{
+    height:4px;
+    width:100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--crack-grad);
+    box-shadow: 0 0 18px 1px rgba(201,162,39,0.45), 0 0 28px 4px rgba(91,75,138,0.3);
+    position:relative;
+    z-index:1;
+  }
+
+  /* ===== CONTENT AREA ===== */
+  .content-wrap{
+    background: var(--parchment);
+    min-height: 60vh;
+  }
+  .content{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 56px 28px 100px;
+  }
+  .panel{ display:none; animation: fadeIn 0.35s ease; }
+  .panel.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ===== TYPOGRAPHY ===== */
+  h2.section-title{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size: 36px;
+    color: var(--navy);
+    margin: 0 0 6px;
+    border-bottom: 3px solid var(--gold);
+    padding-bottom: 16px;
+  }
+  .section-flavor{
+    font-family:'Spectral', serif;
+    font-style: italic;
+    font-size: 16.5px;
+    line-height:1.7;
+    color: var(--ink-soft);
+    margin: 22px 0 30px;
+  }
+  h3.feat-h{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    font-size: 22px;
+    color: var(--navy-light);
+    margin: 38px 0 8px;
+  }
+  h4.sub-h{
+    font-family:'Spectral', serif;
+    font-weight:600;
+    font-size: 26px;
+    color: var(--navy);
+    margin: 0 0 4px;
+    padding-bottom:10px;
+    border-bottom: 2px solid var(--line);
+  }
+  .level-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--violet);
+    background: rgba(91,75,138,0.08);
+    border: 1px solid rgba(91,75,138,0.25);
+    border-radius: 5px;
+    padding: 3px 9px;
+    display:inline-block;
+    margin: 18px 0 10px;
+    letter-spacing: 0.4px;
+  }
+  p{ font-size:15.5px; line-height:1.75; margin: 0 0 14px; color: var(--ink); }
+  strong.lead{ color: var(--navy); font-weight: 700; }
+  ul.feat-list{ margin: 8px 0 18px; padding-left: 22px; }
+  ul.feat-list li{ font-size:15.5px; line-height:1.7; margin-bottom:8px; }
+  ul.feat-list li strong{ color:var(--navy); }
+
+  .totem-line{
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: -4px 0 18px;
+    padding-left: 14px;
+    border-left: 3px solid var(--gold-soft);
+  }
+
+  /* ===== SIDEBAR / CALLOUT ===== */
+  .callout{
+    background: var(--parchment-dim);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--gold);
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .callout.violet{ border-left-color: var(--violet); }
+  .callout-title{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size: 16px;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .callout p{ font-size:14.5px; margin-bottom:8px; color: var(--ink-soft); }
+  .callout p:last-child{ margin-bottom:0; }
+
+  /* ===== TABLES ===== */
+  .tbl-wrap{ overflow-x:auto; margin: 18px 0 28px; border-radius:8px; border:1px solid var(--line); }
+  table{ width:100%; border-collapse:collapse; background:#fff; font-size: 13.5px; }
+  thead th{
+    background: var(--navy);
+    color: var(--parchment);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size: 12px;
+    letter-spacing:0.3px;
+    text-transform:uppercase;
+    padding: 10px 12px;
+    text-align:left;
+    white-space:nowrap;
+  }
+  tbody td{
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+  }
+  tbody tr:nth-child(even){ background: var(--parchment-dim); }
+  tbody tr:hover{ background: rgba(201,162,39,0.08); }
+  td.center, th.center{ text-align:center; }
+  td.lvl{ font-family:'JetBrains Mono',monospace; font-weight:600; color:var(--navy-light); white-space:nowrap; }
+
+  /* ===== SUBCLASS GRID NAV ===== */
+  .sub-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 24px 0 44px;
+  }
+  .sub-chip{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-size: 13px;
+    font-weight:600;
+    color: var(--navy-light);
+    transition: all 0.2s ease;
+    text-align:left;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .sub-chip .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .sub-chip:hover{ border-color: var(--gold); background: rgba(201,162,39,0.06); transform: translateY(-1px); }
+
+  .subclass-block{
+    margin-bottom: 64px;
+    padding-bottom: 44px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .subclass-block:last-child{ border-bottom:none; }
+
+  /* ===== SPELL CARDS ===== */
+  .spell-level-group{ margin-bottom: 36px; }
+  .spell-level-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight:700;
+    color: var(--violet);
+    text-transform:uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .spell-level-label::after{ content:""; flex:1; height:1px; background: var(--line); }
+  .spell-tags{ font-size:14.5px; line-height:1.9; color: var(--ink); }
+  .new-spell-pill{
+    display:inline-block;
+    background: var(--violet);
+    color: #fff;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight:600;
+    padding: 1px 7px;
+    border-radius: 4px;
+    margin-left: 4px;
+    letter-spacing:0.3px;
+    vertical-align: 1px;
+  }
+
+  .spell-card{
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 24px 26px;
+    margin-bottom: 22px;
+  }
+  .spell-card h4{
+    font-family:'Spectral', serif;
+    font-weight:700;
+    font-size: 21px;
+    color: var(--navy);
+    margin: 0 0 4px;
+  }
+  .spell-meta-line{
+    font-style: italic;
+    font-size: 13.5px;
+    color: var(--violet);
+    margin-bottom: 14px;
+  }
+  .spell-stats{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 24px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    padding-bottom:14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .spell-stats span b{ color:var(--navy); }
+
+  /* ===== FOOTER ===== */
+  footer{
+    background: var(--navy-deep);
+    text-align:center;
+    padding: 30px 20px 36px;
+    color: rgba(247,243,232,0.4);
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 720px){
+    .tab-btn{ font-size:12px; padding:13px 6px 14px; }
+    .tab-btn svg{ width:16px; height:16px; }
+    .tcount{ display:none; }
+    .masthead h1{ font-size: 38px; }
+    h2.section-title{ font-size:28px; }
+    .sub-grid{ grid-template-columns: 1fr 1fr; }
+    .spell-stats{ grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px){
+    .sub-grid{ grid-template-columns: 1fr; }
+  }
+
+  /* focus visibility */
+  button:focus-visible, .sub-chip:focus-visible{
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .panel{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">A New Class for the Fifth Edition Game</div>
+  <h1>The Shaman</h1>
+  <p class="sub">Conduits of the Planes</p>
+
+  <nav class="tab-nav" role="tablist" aria-label="Shaman reference sections">
+    <button class="tab-btn active" data-tab="core" role="tab" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l2.8 2.8M16.2 16.2L19 19M19 5l-2.8 2.8M7.8 16.2L5 19"/></svg>
+      Core Class
+      <span class="tcount">Levels 1–20</span>
+    </button>
+    <button class="tab-btn" data-tab="paths" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18M7 7l10 10M17 7L7 17"/></svg>
+      Planar Paths
+      <span class="tcount">9 Subclasses</span>
+    </button>
+    <button class="tab-btn" data-tab="spells" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l2.2 6.8H21l-5.6 4.2L17.6 20 12 15.8 6.4 20l2.2-7L3 8.8h6.8z"/></svg>
+      Spells
+      <span class="tcount">17 + 3 New</span>
+    </button>
+    <button class="tab-btn" data-tab="origins" role="tab" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="12" rx="9" ry="4.5"/><ellipse cx="12" cy="12" rx="4.5" ry="9"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>
+      Planar Origins
+      <span class="tcount">Reference</span>
+    </button>
+  </nav>
+</header>
+
+<div class="crack" id="crackbar"></div>
+
+<div class="content-wrap">
+  <div class="content">
+
+    <!-- ============================================================ -->
+    <!-- CORE CLASS PANEL                                              -->
+    <!-- ============================================================ -->
+    <section class="panel active" id="panel-core">
+      <h2 class="section-title">The Shaman</h2>
+      <p class="section-flavor">Shamans are living conduits between the Material Plane and the infinite realms beyond. Where wizards study the planes from dusty tomes and clerics beseech distant gods, a shaman becomes the threshold itself. They channel raw planar energy into strikes, words, and the very fabric of reality, negotiating with forces that predate mortal civilization. A shaman's power is never wholly their own; it is borrowed, bartered, and sometimes paid for in vulnerability. They walk the thin places where worlds bleed together, summoning spirits, whispering across voids, and bending fate to their will.</p>
+
+      <p>Shamans rarely seek glory. Most begin as hermits, tribal elders, or wanderers drawn to ancient standing stones or storm-wracked peaks. Their magic demands wisdom above all: the quiet insight to listen when the planes speak back. Yet charisma tempers their art, for even the mightiest spirit respects a voice that commands respect.</p>
+
+      <h3 class="feat-h">Creating a Shaman</h3>
+      <p>When creating a shaman, consider how you first touched another plane. Were you born near a ley line that sang in your dreams? Did a near-death vision grant you a spirit guide? Or did you stumble through a faerie ring as a child and return changed? Work with your DM to decide which Planar Path calls to you, and consider how your relationship with the vulnerable state shapes your character.</p>
+
+      <h3 class="feat-h">Class Features</h3>
+      <div class="callout violet">
+        <div class="callout-title">A Note on Terminology</div>
+        <p>Several shaman features below — and several Planar Path features in the Planar Paths tab — refer to a creature "of planar origin," an "extraplanar" creature or influence, or similar language. For the complete, table-ready definition of what these terms cover, including creature types, named exceptions, and how to rule on non-creature extraplanar effects, see the <b>Planar Origins</b> tab.</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Hit Points</div>
+        <p><b>Hit Dice:</b> 1d8 per shaman level &nbsp;·&nbsp; <b>HP at 1st Level:</b> 8 + Constitution modifier &nbsp;·&nbsp; <b>HP at Higher Levels:</b> 1d8 (or 5) + Constitution modifier per level after 1st</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Proficiencies</div>
+        <p><b>Armor:</b> Light, medium, shields &nbsp;·&nbsp; <b>Weapons:</b> Simple weapons, spears, quarterstaffs, scimitars</p>
+        <p><b>Saving Throws:</b> Wisdom, Charisma &nbsp;·&nbsp; <b>Skills:</b> Choose two — Arcana, Deception, Insight, Nature, Persuasion, Religion, Survival</p>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Equipment</div>
+        <p>(a) a spear or (b) a quarterstaff &nbsp;·&nbsp; (a) leather armor and a shield or (b) scale mail &nbsp;·&nbsp; an explorer's pack &nbsp;·&nbsp; a spirit totem (5 gp)</p>
+      </div>
+
+      <h3 class="feat-h">The Shaman Table</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th class="center">Level</th><th class="center">Prof.</th><th class="center">SP Pool</th><th>Features</th></tr></thead>
+          <tbody>
+            <tr><td class="center lvl">1st</td><td class="center">+2</td><td class="center">Wis +2</td><td>Mystical Awareness, Spiritual Insight, Otherworldly Conduit</td></tr>
+            <tr><td class="center lvl">2nd</td><td class="center">+2</td><td class="center">Wis +4</td><td>Spellcasting, Planar Communion Ritual</td></tr>
+            <tr><td class="center lvl">3rd</td><td class="center">+2</td><td class="center">Wis +6</td><td>Planar Path</td></tr>
+            <tr><td class="center lvl">4th</td><td class="center">+2</td><td class="center">Wis +8</td><td>Ability Score Improvement</td></tr>
+            <tr><td class="center lvl">5th</td><td class="center">+3</td><td class="center">Wis +10</td><td>Extra Attack</td></tr>
+            <tr><td class="center lvl">6th</td><td class="center">+3</td><td class="center">Wis +12</td><td>Path Feature</td></tr>
+            <tr><td class="center lvl">7th</td><td class="center">+3</td><td class="center">Wis +14</td><td>Planar Attunement</td></tr>
+            <tr><td class="center lvl">8th</td><td class="center">+3</td><td class="center">Wis +16</td><td>Ability Score Improvement</td></tr>
+            <tr><td class="center lvl">9th</td><td class="center">+4</td><td class="center">Wis +18</td><td>Resonant Strikes</td></tr>
+            <tr><td class="center lvl">10th</td><td class="center">+4</td><td class="center">Wis +20</td><td>Path Feature</td></tr>
+            <tr><td class="center lvl">11th</td><td class="center">+4</td><td class="center">Wis +22</td><td>Conduit Surge</td></tr>
+            <tr><td class="center lvl">12th</td><td class="center">+4</td><td class="center">Wis +24</td><td>Ability Score Improvement</td></tr>
+            <tr><td class="center lvl">13th</td><td class="center">+5</td><td class="center">Wis +26</td><td>—</td></tr>
+            <tr><td class="center lvl">14th</td><td class="center">+5</td><td class="center">Wis +28</td><td>Path Feature</td></tr>
+            <tr><td class="center lvl">15th</td><td class="center">+5</td><td class="center">Wis +30</td><td>Transcendent Conduit</td></tr>
+            <tr><td class="center lvl">16th</td><td class="center">+5</td><td class="center">Wis +32</td><td>Ability Score Improvement</td></tr>
+            <tr><td class="center lvl">17th</td><td class="center">+6</td><td class="center">Wis +34</td><td>Conduit Surge</td></tr>
+            <tr><td class="center lvl">18th</td><td class="center">+6</td><td class="center">Wis +36</td><td>Path Capstone</td></tr>
+            <tr><td class="center lvl">19th</td><td class="center">+6</td><td class="center">Wis +38</td><td>Ability Score Improvement</td></tr>
+            <tr><td class="center lvl">20th</td><td class="center">+6</td><td class="center">Wis +40</td><td>Resonant Connection</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="feat-h">Otherworldly Conduit &amp; Shaman Points</h3>
+      <p><strong class="lead">1st-level shaman feature.</strong> You can channel raw planar energy through your body and soul, fueled by your Shaman Points. Your pool equals 2 × your shaman level + your Wisdom modifier, and you regain all expended points on a short or long rest. You may activate only one Conduit option per turn, though ongoing effects (an active Planar Infusion or Planar Surge) may persist without re-spending points.</p>
+      <p>You also reference your <b>Planar Die</b> for several options below — it starts at d6 and increases as you gain levels (see Conduit Surge, 11th level: d8 at 11th, d10 at 17th).</p>
+
+      <div class="callout">
+        <div class="callout-title">Quick Reference</div>
+        <div class="tbl-wrap" style="margin:10px 0 0;">
+          <table>
+            <thead><tr><th>Feature</th><th class="center">Cost</th><th class="center">Activation</th><th>Duration</th></tr></thead>
+            <tbody>
+              <tr><td><b>Planar Infusion</b></td><td class="center">1 SP</td><td class="center">Bonus Action</td><td>Concentration, 1 min</td></tr>
+              <tr><td><b>Reality Nudge</b></td><td class="center">2 SP</td><td class="center">Reaction</td><td>Instantaneous</td></tr>
+              <tr><td><b>Planar Surge</b></td><td class="center">2 SP</td><td class="center">Bonus Action</td><td>Concentration, 1 min</td></tr>
+              <tr><td><b>Spirit Healing</b></td><td class="center">1 or 2 SP</td><td class="center">Action</td><td>Instantaneous</td></tr>
+              <tr><td><b>Planar Ward</b></td><td class="center">1 SP</td><td class="center">Reaction</td><td>Until end of current turn</td></tr>
+              <tr><td><b>Planar Manifestation</b></td><td class="center">3 SP</td><td class="center">Bonus Action</td><td>Set by your Planar Path</td></tr>
+              <tr><td><b>Shamanic Exit</b></td><td class="center">5 SP</td><td class="center">Reaction</td><td>Instantaneous (15th level)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:30px 0 6px;">Planar Infusion — 1 Shaman Point, Bonus Action</h4>
+      <p>You suffuse your weapon with planar energy. For up to 1 minute, you must maintain concentration on this effect as you would a spell. While it lasts, your weapon attacks deal an extra 1d6 damage of your signature damage type. Once per turn, when you hit with a weapon attack while this effect is active, you also add your Wisdom modifier to that damage roll. The extra damage die increases to 1d8 at 11th level and 1d10 at 17th level (see Conduit Surge). Activating Planar Surge while Planar Infusion is active immediately ends Planar Infusion, since you cannot concentrate on both at once.</p>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:30px 0 6px;">Reality Nudge — 2 Shaman Points, Reaction</h4>
+      <p>When a creature you can see within 60 feet of you (including yourself) makes an attack roll, an ability check, or a saving throw, you can use your reaction to roll your Planar Die and add or subtract the number rolled from that creature's roll, choosing to add or subtract before you roll the die. You must use this feature before the outcome of the triggering roll is known — that is, before the DM determines whether the attack hits, the check succeeds, or the save is made.</p>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:30px 0 6px;">Planar Surge — 2 Shaman Points, Bonus Action</h4>
+      <p>You create a sphere of planar disturbance with a 10-foot radius, centered on a point you can see within 60 feet of you. The sphere lasts for up to 1 minute, and you must maintain concentration on it as you would a spell. Any creature that enters the sphere for the first time on a turn or ends its turn there takes 1d6 + your Wisdom modifier damage of your signature damage type. The sphere is stationary once created and does not move with you. Activating Planar Infusion while Planar Surge is active immediately ends Planar Surge, since you cannot concentrate on both at once.</p>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:30px 0 6px;">Spirit Healing — 1 or 2 Shaman Points, Action</h4>
+      <p>As an action, you touch a creature within 5 feet of you (you can target yourself) and channel planar energy to heal or mend it. Choose one of the following options when you use this feature. This effect does not require concentration.</p>
+      <ul class="feat-list">
+        <li><b>Restore (1 SP).</b> The target regains hit points equal to 1d8 + your Wisdom modifier (minimum 1 hit point regained).</li>
+        <li><b>Mend (2 SP).</b> Choose one of the following two effects — you cannot choose both with a single use of this option. Either the target regains hit points equal to 2d8 + your Wisdom modifier (minimum 1 hit point regained), or the target's blinded, deafened, paralyzed, or poisoned condition ends (choose which one if more than one applies; the target regains no hit points if you choose this effect).</li>
+      </ul>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:30px 0 6px;">Planar Ward — 1 Shaman Point, Reaction</h4>
+      <p>When you or a creature you can see within 30 feet of you takes damage, you can use your reaction to grant that creature resistance to the triggering damage type. This resistance applies to the triggering instance of damage and to any additional damage of that same type the creature takes before the start of your next turn, after which the resistance ends.</p>
+
+      <div class="callout violet">
+        <div class="callout-title">Planar Manifestation &amp; Shamanic Exit</div>
+        <p>Planar Manifestation (3 SP) activates the unique feature granted by your Planar Path at 6th level — its full effect and duration are written out under your chosen path in the Planar Paths tab. Shamanic Exit (5 SP) is unlocked at 15th level by the Transcendent Conduit feature, and its full text appears there, later in this tab.</p>
+      </div>
+
+      <h3 class="feat-h">Mystical Awareness</h3>
+      <p><strong class="lead">1st-level shaman feature.</strong> You instinctively sense the weave between worlds. You always know which plane you are on and its dominant alignment traits. You have advantage on ability checks made to detect portals, identify a creature's plane of origin, perceive invisible spirits, or recognize extraplanar influences. When you succeed on such a check, you may add your Wisdom modifier to the result.</p>
+
+      <h3 class="feat-h">Spiritual Insight</h3>
+      <p><strong class="lead">1st-level shaman feature.</strong> Your constant connection to the planes grants you insights into the unseen world and the minds of those touched by it. You gain all of the following benefits:</p>
+      <ul class="feat-list">
+        <li><strong>Language.</strong> You learn one language associated with extraplanar beings: Abyssal, Celestial, Infernal, Primordial, Sylvan, or Undercommon.</li>
+        <li><strong>Planar Intuition.</strong> When you make a Deception, Insight, or Persuasion check involving a creature of planar origin, you may add your Wisdom modifier to the roll.</li>
+        <li><strong>Spirit Whisper.</strong> As an action, focus on one planar creature within 30 feet; gain advantage on your next Charisma or Intelligence check with it before the end of your next turn, adding your Wisdom modifier.</li>
+        <li><strong>Planar Question.</strong> Once per long rest, meditate for 10 minutes and ask the planes a yes/no question about a creature, location, or event you've encountered. The DM answers Yes, No, Unclear, or Unknown. If unanswerable, the feature is expended without result.</li>
+      </ul>
+
+      <h3 class="feat-h">Spellcasting</h3>
+      <p><strong class="lead">2nd-level shaman feature.</strong> Wisdom is your spellcasting ability. You prepare a number of spells equal to half your shaman level (rounded up) + Wisdom modifier. Spell save DC = 8 + proficiency bonus + Wisdom modifier. You can cast ritual-tagged spells as rituals and use your spirit totem as a focus. You don't need material components for Planar Path Additional Spells unless they carry a gold piece cost.</p>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th class="center">Lvl</th><th class="center">1st</th><th class="center">2nd</th><th class="center">3rd</th><th class="center">4th</th><th class="center">5th</th></tr></thead>
+          <tbody>
+            <tr><td class="center lvl">2nd</td><td class="center">2</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">3rd</td><td class="center">3</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">4th</td><td class="center">3</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">5th</td><td class="center">4</td><td class="center">2</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">6th</td><td class="center">4</td><td class="center">2</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">7th</td><td class="center">4</td><td class="center">3</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">8th</td><td class="center">4</td><td class="center">3</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">9th</td><td class="center">4</td><td class="center">3</td><td class="center">2</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">10th</td><td class="center">4</td><td class="center">3</td><td class="center">2</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">11th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">12th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">—</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">13th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">1</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">14th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">1</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">15th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">2</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">16th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">2</td><td class="center">—</td></tr>
+            <tr><td class="center lvl">17th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">3</td><td class="center">1</td></tr>
+            <tr><td class="center lvl">18th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">3</td><td class="center">1</td></tr>
+            <tr><td class="center lvl">19th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">3</td><td class="center">2</td></tr>
+            <tr><td class="center lvl">20th</td><td class="center">4</td><td class="center">3</td><td class="center">3</td><td class="center">3</td><td class="center">2</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="feat-h">Planar Communion Ritual</h3>
+      <p><strong class="lead">2nd-level shaman feature.</strong> You can perform a 10-minute ritual that opens a deeper conduit to the planes, placing you in the vulnerable state.</p>
+
+      <div class="callout violet">
+        <div class="callout-title">The Vulnerable State</div>
+        <p><b>While vulnerable:</b> disadvantage on Constitution saves · attack rolls against you have advantage · cannot regain Shaman Points on a short rest.</p>
+        <p>You can end it as a bonus action, or it ends automatically on a long rest. While vulnerable, you also gain the benefits below.</p>
+      </div>
+
+      <ul class="feat-list">
+        <li><strong>Conduit Efficiency.</strong> Conduit options cost 1 fewer Shaman Point (minimum 1).</li>
+        <li><strong>Amplified Conduit.</strong> Features adding your Wisdom modifier to damage, healing, or checks instead add double.</li>
+        <li><strong>Resistance Override.</strong> Your attacks and Conduit features ignore resistance (not immunity) to your signature damage type. Some Path features extend this to immunity while vulnerable.</li>
+        <li><strong>Summoning Vitality.</strong> Creatures you summon gain temporary hit points equal to 5 × your Wisdom modifier when they appear.</li>
+      </ul>
+
+      <h3 class="feat-h">Planar Path</h3>
+      <p><strong class="lead">3rd-level shaman feature.</strong> You embrace a Planar Path defining how you channel extraplanar power, gaining features at 3rd, 6th, 10th, 14th, and 18th level. Nine paths are detailed in the Planar Paths tab. Choosing the Shaman of the Divine permanently guides your alignment toward good.</p>
+
+      <h3 class="feat-h">Ability Score Improvement</h3>
+      <p>When you reach 4th level, and again at 8th, 12th, 16th, and 19th, increase one ability score by 2, or two scores by 1 each (max 20).</p>
+
+      <h3 class="feat-h">Extra Attack</h3>
+      <p><strong class="lead">5th-level shaman feature.</strong> You can attack twice, instead of once, whenever you take the Attack action.</p>
+
+      <h3 class="feat-h">Planar Attunement</h3>
+      <p><strong class="lead">7th-level shaman feature.</strong> Your bond with the planes deepens into active awareness.</p>
+      <ul class="feat-list">
+        <li><strong>Signature Flexibility.</strong> If your Path offers a choice of signature damage type, change it as a bonus action.</li>
+        <li><strong>Extraplanar Senses.</strong> Mystical Awareness advantage extends to Survival checks in extraplanar environments or tracking planar creatures.</li>
+        <li><strong>Toughened Conduit.</strong> Your hit point maximum increases by your shaman level, and again by 1 each level thereafter.</li>
+      </ul>
+
+      <h3 class="feat-h">Resonant Strikes</h3>
+      <p><strong class="lead">9th-level shaman feature.</strong> Your weapon attacks count as magical for overcoming resistance and immunity to nonmagical attacks. When you hit with a weapon attack while Planar Infusion is active, the target cannot take reactions until the start of your next turn.</p>
+
+      <h3 class="feat-h">Conduit Surge</h3>
+      <p><strong class="lead">11th-level shaman feature.</strong> Your Planar Die increases from d6 to d8, and Planar Infusion's extra damage increases to 1d8. At 17th level, both increase again — d10 and 1d10.</p>
+
+      <h3 class="feat-h">Transcendent Conduit</h3>
+      <p><strong class="lead">15th-level shaman feature.</strong> You have mastered the vulnerable state, learning to enter it instantly and to briefly transcend it entirely. You gain the following three benefits.</p>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:24px 0 6px;">Rapid Entry</h4>
+      <p>You can perform a Planar Communion Ritual as a bonus action rather than spending 10 minutes on it. You can use this faster ritual a number of times equal to your Wisdom modifier (minimum once); you regain all expended uses when you finish a long rest. You can still perform the ritual the normal way, taking 10 minutes, an unlimited number of times.</p>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:24px 0 6px;">Momentary Transcendence</h4>
+      <p>Once per long rest, while you are in the vulnerable state, you can end the vulnerable state as a free action while retaining all of its benefits (Conduit Efficiency, Amplified Conduit, Resistance Override, and Summoning Vitality, plus any benefits granted by your Planar Path's ritual feature) for 1 minute. During this window, none of the vulnerable state's penalties apply — you do not have disadvantage on Constitution saves, attacks against you do not have advantage, and you can still regain Shaman Points on a short rest. This window ends early, before the full minute elapses, if you take the Attack action or cast a spell of 1st level or higher.</p>
+
+      <h4 style="font-family:'Spectral',serif; font-weight:600; font-size:19px; color:var(--navy); margin:24px 0 6px;">Shamanic Exit — 5 Shaman Points, Reaction</h4>
+      <p>When you are critically hit by an attack, or when damage would reduce you to 0 hit points, you can use your reaction and spend 5 Shaman Points to activate Shamanic Exit before the triggering effect is resolved.</p>
+      <ul class="feat-list">
+        <li>If the trigger was being reduced to 0 hit points, you instead drop to 1 hit point. If the trigger was a critical hit, that attack's extra critical-hit damage dice are negated (the attack still deals its normal, non-critical damage).</li>
+        <li>You then teleport to an unoccupied space you can see within 60 feet of your original position.</li>
+        <li>You may choose a number of willing creatures, up to your Wisdom modifier (minimum 1), within 30 feet of your original position. Those creatures teleport with you, appearing in unoccupied spaces within 10 feet of your destination (or in the nearest available unoccupied space if none are within 10 feet).</li>
+        <li>Finally, you choose a number of creatures, up to your Wisdom modifier (minimum 1), within 30 feet of your original position. Each must succeed on a Constitution saving throw (DC equal to your spell save DC) or take 1d4 × your Wisdom modifier force damage and become frightened of you for 1 minute. A frightened creature can repeat the saving throw at the end of each of its turns, ending the effect on a success.</li>
+      </ul>
+      <p>You can use Shamanic Exit's reaction once per long rest, regardless of how many Shaman Points you have remaining, in addition to the normal limits on reactions per round.</p>
+
+      <h3 class="feat-h">Resonant Connection</h3>
+      <p><strong class="lead">20th-level shaman feature.</strong> Your bond with the planes is no longer a burden — it is your natural state. You gain the following two benefits.</p>
+      <ul class="feat-list">
+        <li><b>Unburdened Conduit.</b> The vulnerable state no longer imposes disadvantage on your Constitution saving throws, no longer grants advantage to attack rolls made against you, and no longer prevents you from regaining Shaman Points on a short rest. You retain all benefits normally granted by the Planar Communion Ritual (Conduit Efficiency, Amplified Conduit, Resistance Override, Summoning Vitality, and any Planar Path ritual benefits) permanently, whether or not you have performed the ritual and whether or not you are technically in the vulnerable state.</li>
+        <li><b>Effortless Ritual.</b> Once per long rest, you can perform any Planar Communion Ritual as a bonus action without entering the vulnerable state at all and without triggering any of its remaining effects, since Unburdened Conduit already grants you its benefits at all times. This use exists primarily to satisfy any Planar Path feature that asks whether you have performed the ritual recently.</li>
+      </ul>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PLANAR PATHS PANEL                                            -->
+    <!-- ============================================================ -->
+    <section class="panel" id="panel-paths">
+      <h2 class="section-title">Planar Paths</h2>
+      <p class="section-flavor">At 3rd level, a shaman embraces a Planar Path — a specialization reflecting the realm whose power flows most readily through them. Each grants a Planar Bond, Additional Spells, a Manifestation (3 SP), and further features at 10th, 14th, and 18th level.</p>
+
+      <div class="sub-grid" id="subGrid">
+        <button class="sub-chip" data-jump="sub-elements"><span class="dot" style="background:#D9722E"></span>Eternal Elements</button>
+        <button class="sub-chip" data-jump="sub-feywild"><span class="dot" style="background:#9B6FD1"></span>Feywild</button>
+        <button class="sub-chip" data-jump="sub-shadowfell"><span class="dot" style="background:#4A4666"></span>Shadowfell</button>
+        <button class="sub-chip" data-jump="sub-outerveil"><span class="dot" style="background:#3E7CB1"></span>Outer Veil</button>
+        <button class="sub-chip" data-jump="sub-warden"><span class="dot" style="background:#6B8E63"></span>Material Warden</button>
+        <button class="sub-chip" data-jump="sub-divine"><span class="dot" style="background:#C9A227"></span>Divine</button>
+        <button class="sub-chip" data-jump="sub-winding"><span class="dot" style="background:#B05C8A"></span>Winding Ways</button>
+        <button class="sub-chip" data-jump="sub-totem"><span class="dot" style="background:#5B4B8A"></span>Awakened Totem</button>
+        <button class="sub-chip" data-jump="sub-sending"><span class="dot" style="background:#3E8E7E"></span>Shaman of Sending</button>
+      </div>
+
+      <!-- ETERNAL ELEMENTS -->
+      <div class="subclass-block" id="sub-elements">
+        <h4 class="sub-h">Shaman of the Eternal Elements</h4>
+        <p class="totem-line">Totem: a Primal Core — a fist-sized crystal or storm-forged stone swirling with motes of your current element.</p>
+        <p>You have forged a bond with the churning Inner Planes of fire, water, earth, and air. You are a living storm, reshaping battlefields with primal fury.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Choose fire, cold, lightning, or acid as your signature, gaining resistance to it (a second type while your Manifestation is active, from 6th level). When you hit with Planar Infusion, the target's space becomes hazardous terrain (5-ft radius, until end of your next turn; 1d6 + Wis mod damage). One zone per target. While vulnerable, change signature freely each turn, terrain radius increases by 5 feet, and your Resistance Override extends to immunity for your current type.</p>
+        <p><i>Additional Spells: absorb elements, gust of wind, protection from energy, elemental bane, conjure elemental.</i></p>
+        <span class="level-tag">6th Level — Elemental Aspect</span>
+        <p>Bonus action (3 SP): elemental aspect for 1 minute — fly/swim/burrow 30 ft, resistances become immunities. End early to grant allies THP equal to your shaman level.</p>
+        <span class="level-tag">10th Level — Elemental Harmony</span>
+        <p>Terrain lasts until end of your next turn, deals full Wis mod damage. While vulnerable, swap signature as a bonus action once per turn at no cost.</p>
+        <span class="level-tag">14th Level — Primal Resilience</span>
+        <p>While vulnerable: resistance to all elemental damage; THP = shaman level + Wis mod at the start of each turn.</p>
+        <span class="level-tag">18th Level — Avatar of the Elements (1/long rest)</span>
+        <p>Action: 1 minute as an elemental avatar — immune to signature type, all Conduit options cost 0 SP, terrain covers 30 ft and moves with you, signature changes freely each turn.</p>
+      </div>
+
+      <!-- FEYWILD -->
+      <div class="subclass-block" id="sub-feywild">
+        <h4 class="sub-h">Shaman of the Feywild</h4>
+        <p class="totem-line">Totem: a Glamour Blossom — a living flower or crystal petal shifting with color and mesmerizing light.</p>
+        <p>You walk the glittering, treacherous paths of the Feywild. Your power is beautiful, capricious, and impossible to pin down.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Choose radiant or psychic each long rest, gaining resistance to both (shared with summons). On an Infusion hit: target has disadvantage on its next charm/illusion save; on a crit, an ally within 30 ft gains advantage on its next attack or Cha check. While vulnerable: fixed-duration charm/illusion effects double in duration (max 24 hr); cast misty step as a bonus action without a slot (range +5 ft per Wis mod), bringing one ally.</p>
+        <p><i>Additional Spells: faerie fire, phantasmal force, hypnotic pattern, greater invisibility, dominate person.</i></p>
+        <span class="level-tag">6th Level — Step Through the Veil</span>
+        <p>Bonus action (3 SP): misty step without a slot, bringing one willing creature within 5 ft. Advantage on Charisma checks with fey.</p>
+        <span class="level-tag">10th Level — Fey Trickery</span>
+        <p>When a creature fails a save against your charm/illusion spell, use Spirit Whisper on it free. While vulnerable, your bonus-action misty step usable twice per turn.</p>
+        <span class="level-tag">14th Level — Eternal Glamour</span>
+        <p>While vulnerable: flying speed = walking speed, immune to charmed/frightened; summoned fey have advantage on attacks within 10 ft of you.</p>
+        <span class="level-tag">18th Level — Lord of the Feywild (1/long rest)</span>
+        <p>Action: 1 minute as a fey sovereign — your charm/illusion effects resist Dispel Magic (advantage on the check, DC +Wis mod); teleport 30 ft once/turn as a reaction when hit; you and allies within 30 ft have advantage on saves vs. spells.</p>
+      </div>
+
+      <!-- SHADOWFELL -->
+      <div class="subclass-block" id="sub-shadowfell">
+        <h4 class="sub-h">Shaman of the Shadowfell</h4>
+        <p class="totem-line">Totem: an Echo Shard — blackened mirror or frozen tear, reflecting only shadows and sorrowful faces.</p>
+        <p>You have peered into the gloom of the Shadowfell and returned carrying its hunger. Your presence drains hope and life alike.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Choose necrotic or cold each long rest, gaining resistance to both, plus resistance to nonmagical B/P/S in dim light or darkness. On an Infusion hit: you or an ally within 30 ft heals Wis mod HP; target has disadvantage on its next attack or save. While vulnerable: bonus action for necrotic immunity until your next turn (once/turn); darkness effects gain +10 ft radius.</p>
+        <p><i>Additional Spells: false life, darkness, fear, shadow of moil, enervation.</i></p>
+        <span class="level-tag">6th Level — Shadow Walker</span>
+        <p>Advantage on Stealth in dim light/darkness; move through shadowed surfaces as difficult terrain (1d10 force damage if you end your turn inside one). Bonus action (3 SP): invisible until your next turn.</p>
+        <span class="level-tag">10th Level — Echoing Despair</span>
+        <p>Planar Surge in dim light/darkness becomes magical darkness, necrotic damage. While vulnerable, creatures failing saves vs. your Infusion disadvantage, Planar Surge, or Fear take psychic damage = your shaman level.</p>
+        <span class="level-tag">14th Level — Shadow Shroud</span>
+        <p>While vulnerable: THP = shaman level + Wis mod each turn; immune to opportunity attacks in dim light/darkness.</p>
+        <span class="level-tag">18th Level — Emissary of the Shadowfell (1/long rest)</span>
+        <p>Action: 1 minute as a living shadow — immune to necrotic/cold, resist all damage in dim light/darkness, creatures within 10 ft take necrotic damage = Wis mod at end of their turn.</p>
+      </div>
+
+      <!-- OUTER VEIL -->
+      <div class="subclass-block" id="sub-outerveil">
+        <h4 class="sub-h">Shaman of the Outer Veil</h4>
+        <p class="totem-line">Totem: a Cosmic Thread — shimmering astral silk or a crystalline eye reflecting alien constellations.</p>
+        <p>You serve as ambassador to the Astral Sea and the Outer Planes. Your words carry the weight of gods and your touch rewrites the laws of existence.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Choose psychic or force each long rest, gaining resistance plus advantage on saves vs. charm/fear/alignment alteration. On an Infusion hit: Wis save or pushed/pulled 10 ft + extra damage; teleport spell range +5 ft per Wis mod. While vulnerable, bonus action once/turn: flip gravity in a 10-ft cube, halve a creature's speed, or (2 SP, once/short or long rest) a 10-ft anti-magic sphere suppressing 3rd-level-or-lower spells.</p>
+        <p><i>Additional Spells: comprehend languages, detect thoughts, sending, dimension door, contact other plane.</i></p>
+        <span class="level-tag">6th Level — Astral Voice</span>
+        <p>Telepathy with Int 6+ creatures within 120 ft. Bonus action (3 SP, once/short or long rest): force a reroll of an attack, save, or check for self or an ally within 60 ft.</p>
+        <span class="level-tag">10th Level — Veil Mastery</span>
+        <p>Law rewrites last until end of your next turn, affect two targets while vulnerable. Once/turn, use Reality Nudge as a bonus action for 1 SP.</p>
+        <span class="level-tag">14th Level — Cosmic Fortitude</span>
+        <p>While vulnerable: can't be moved against your will; creatures ending their turn within 10 ft must succeed on a Wis save or be stunned until the end of their next turn.</p>
+        <span class="level-tag">18th Level — Astral Avatar (1/long rest)</span>
+        <p>Action: 1 minute in the Astral — immune to psychic/force, all movement is teleportation, once/turn force a reroll of a creature's successful save. Ending early grants allies within 60 ft advantage on their next attack or save.</p>
+      </div>
+
+      <!-- MATERIAL WARDEN -->
+      <div class="subclass-block" id="sub-warden">
+        <h4 class="sub-h">Shaman of the Material Warden</h4>
+        <p class="totem-line">Totem: a Wardstone — unworked stone from a sacred ley line site, etched with runes that glow near planar forces.</p>
+        <p>You have sworn yourself to the defense of the Material Plane, anchoring reality and shielding the mortal world from planar threats.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Signature is force; resistance to it plus one other type of your choice. On an Infusion hit, choose: push the target 10 ft, or create a 5-ft ward (1 round) imposing difficult terrain and attack disadvantage on hostiles, dealing <b>1d4</b> force damage to any hostile ending its turn inside. While vulnerable: wards expand to 15 ft; reaction grants an ally resistance to a triggering damage type.</p>
+        <p><i>Additional Spells: shield, warding bond, protection from energy, stoneskin, wall of force.</i></p>
+        <span class="level-tag">6th Level — Anchor Ward</span>
+        <p>Bonus action (3 SP): Anchor Ward on self or ally within 30 ft, 1 minute — resistance to extraplanar damage, advantage on saves vs. charm/fear/forced movement. End early for THP = twice your shaman level.</p>
+        <span class="level-tag">10th Level — Guardian Harmony <span class="new-spell-pill">Ward 1d6</span></span>
+        <p>Wards last until end of your next turn, grant advantage on saves vs. spells. While vulnerable, reaction to move a ward onto a targeted ally. <b>Ward Resonance:</b> the Infusion Ward's force damage increases to 1d6.</p>
+        <span class="level-tag">14th Level — Material Fortitude <span class="new-spell-pill">Ward 1d8</span></span>
+        <p>While vulnerable or within a ward: resistance to all damage, can't be moved against your will. Creatures ending their turn within 10 ft take force damage = Wis mod. <b>Ward Resonance:</b> the Infusion Ward's force damage increases to 1d8.</p>
+        <span class="level-tag">18th Level — Eternal Warden (1/long rest)</span>
+        <p>Action: 1 minute as the Eternal Warden — immune to force, resist everything else; wards expand to 30 ft and move with you; you and warded allies immune to charm/fear. Once during the duration, prevent lethal damage to 0 HP, leaving the target at 1 HP instead.</p>
+      </div>
+
+      <!-- DIVINE -->
+      <div class="subclass-block" id="sub-divine">
+        <h4 class="sub-h">Shaman of the Divine</h4>
+        <p class="totem-line">Totem: a Celestial Sigil — a glowing crystal or golden feather radiating soft light and warmth. (Choosing this path guides your alignment toward good.)</p>
+        <p>You have opened yourself to the radiant glory of the Upper Planes, forever altered by the touch of the heavens.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Switch between radiant and lightning as an action (or freely on a rest). Resistance to necrotic and fire — becomes immunity while vulnerable. On an Infusion hit, choose: outline the target in radiant light (advantage on attacks against it), or deny it reactions with lightning. While vulnerable: radiant/lightning ignore resistance and immunity; reaction grants an ally resistance to necrotic or fire.</p>
+        <p><i>Additional Spells: guiding bolt, spiritual weapon, spirit guardians (radiant only), guardian of faith, flame strike.</i></p>
+        <span class="level-tag">6th Level — Divine Radiance</span>
+        <p>Bonus action (3 SP): divine light for 1 minute, 30/30-ft bright/dim radius. You and allies in the bright light resist necrotic damage, advantage on saves vs. frightened.</p>
+        <span class="level-tag">10th Level — Celestial Grace</span>
+        <p>Radiant/lightning ignore resistance while vulnerable or infused. While vulnerable, reaction grants an ally THP = shaman level + Wis mod when hit.</p>
+        <span class="level-tag">14th Level — Holy Ward</span>
+        <p>Once/long rest, while vulnerable or infused: bonus action grants you and allies within 10 ft immunity to necrotic and fire until the start of your next turn.</p>
+        <span class="level-tag">18th Level — Ascended Herald (1/long rest)</span>
+        <p>Action: 1 minute as an Ascended Herald — 60-ft fly speed, immune to necrotic/fire, radiant/lightning attacks deal maximum damage, allies within 30 ft have advantage on attacks and saves.</p>
+      </div>
+
+      <!-- WINDING WAYS -->
+      <div class="subclass-block" id="sub-winding">
+        <h4 class="sub-h">Shaman of the Winding Ways</h4>
+        <p class="totem-line">Totem: a Waystone — an ever-shifting orb or compass flickering between colors and symbols of many planes.</p>
+        <p>You carry a fragment of every plane within you, adapting and weaving their powers as the moment demands.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Choose any signature (fire, cold, lightning, force, radiant, necrotic, psychic) on a short/long rest, when infused, or when vulnerable. Resistance to two chosen types, plus a third while infused or vulnerable.</p>
+        <p><i>Additional Spells (choose one per level): chaos bolt/find familiar, healing spirit/Tasha's mind whip, blink/summon shadowspawn, banishment/summon elemental, banishing smite/far step.</i></p>
+        <span class="level-tag">6th Level — Winding Way</span>
+        <p>Bonus action (3 SP), 1 minute, choose one: <b>Elemental Surge</b> (15-ft difficult terrain, 1d6 dmg) · <b>Trickster Veil</b> (Deception advantage, impose Insight disadvantage as a reaction) · <b>Shadow Step</b> (invisible as a reaction when hit) · <b>Reality Thread</b> (force one reroll, choose the result) · <b>Warden's Reflection</b> (10-ft ward; attackers take half their damage back, Con save halves).</p>
+        <span class="level-tag">10th Level — Winding Harmony</span>
+        <p>Change signature as a bonus action. While vulnerable, your active Winding Way enhances: larger radii, more uses, longer durations; Warden's Reflection returns full damage instead of half.</p>
+        <span class="level-tag">14th Level — Between the Veils</span>
+        <p>While vulnerable or infused: resistance to all your chosen resistance types at once. Once/long rest while vulnerable, activate a Winding Way as a reaction for 2 SP.</p>
+        <span class="level-tag">18th Level — Master of the Winding Ways (1/long rest)</span>
+        <p>Action: 1 minute — use any Winding Way as a bonus action each turn, change signature freely, grant allies within 30 ft resistance to one type. End early to teleport yourself and 5 willing creatures to any visited Material Plane location.</p>
+      </div>
+
+      <!-- AWAKENED TOTEM -->
+      <div class="subclass-block" id="sub-totem">
+        <h4 class="sub-h">Shaman of the Awakened Totem</h4>
+        <p class="totem-line">Totem: a Living Awakened Totem — indestructible, untargetable, housing a sentient spirit with its own personality.</p>
+        <p>You have awakened the spirit within your totem, forging a living partnership with a sentient being from beyond the Material Plane.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Signature is psychic; resistance to it. On an Infusion hit, a summoned/awakened creature within 60 ft gains Wis mod on its next attack or damage roll. While vulnerable: summons gain THP = shaman level + Wis mod; command them all as one bonus action.</p>
+        <p><i>Additional Spells: find familiar, summon beast, summon fey, summon shadowspawn, summon celestial.</i></p>
+        <span class="level-tag">6th Level — Spirit Companion &amp; Awakened Calling</span>
+        <p>Bonus action (3 SP): summon a CR 1-or-lower companion for 1 hour, attacks deal +1d4 of your signature type. Once/long rest: cast awaken free of slot and component (1 action while vulnerable, otherwise 8 hours). One awakened creature under direct command; extras act independently.</p>
+        <span class="level-tag">10th Level — Planar Control</span>
+        <p>Summons have advantage on saves vs. charm/fear. While vulnerable: concentrate on two summoning spells at once — one 3rd level or lower, one 4th level or higher.</p>
+        <span class="level-tag">14th Level — Spirit Dominion</span>
+        <p>Bonus action: perceive through a summon's senses until your next turn (blind/deaf to your own surroundings meanwhile). While vulnerable or infused: summons resist nonmagical damage.</p>
+        <span class="level-tag">18th Level — Lord of Spirits (1/long rest)</span>
+        <p>Action: 1 minute — summoning spells call one extra creature, summons gain immunity to your signature type, command them all as a bonus action. Ending grants allies within 60 ft a shared resistance for 1 minute.</p>
+      </div>
+
+      <!-- SENDING -->
+      <div class="subclass-block" id="sub-sending">
+        <h4 class="sub-h">Shaman of Sending</h4>
+        <p class="totem-line">Totem: a Sending Compass — silver and crystal, pointing toward distant planes, humming when teleportation draws near.</p>
+        <p>You have become a master of translocation, opening pathways across planes to move allies to safety or hurl enemies into exile.</p>
+        <span class="level-tag">3rd Level — Planar Bond</span>
+        <p>Signature is force; resistance to it. On an Infusion hit: push/pull the target 15 ft, no save required. While vulnerable: teleport range doubles; hostile teleported creatures must succeed on a Charisma save or be stunned until the end of their next turn.</p>
+        <p><i>Additional Spells (by slot level): misty step (2nd), banishment (3rd), dimension door (4th), teleportation circle &amp; far step (5th).</i></p>
+        <span class="level-tag">6th Level — Planar Transit</span>
+        <p>Bonus action (3 SP): teleport yourself or a willing creature within 60 ft to a space within 90 ft, bringing one additional creature per 3 shaman levels.</p>
+        <span class="level-tag">10th Level — Sending Mastery</span>
+        <p>When you teleport a willing creature with a spell, also teleport one additional willing creature within 30 ft of the target. Hostile creatures you banish/teleport have disadvantage on the save while you're vulnerable.</p>
+        <span class="level-tag">14th Level — Dimensional Anchor</span>
+        <p>Creatures you teleport can't take reactions until end of their next turn. Reaction: force a teleporting creature within 60 ft to reroll its save (take the lower) or, if no save applies, make a Charisma save or the teleport fails.</p>
+        <span class="level-tag">18th Level — Master Sender (1/long rest)</span>
+        <p>Action: 1 minute — teleport any number of willing creatures within 60 ft to a visited location, or banish hostiles (Charisma save) to a plane of your choosing.</p>
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- SPELLS PANEL                                                  -->
+    <!-- ============================================================ -->
+    <section class="panel" id="panel-spells">
+      <h2 class="section-title">The Shaman Spell List</h2>
+      <p class="section-flavor">All spells below not marked New are official spells from the Player's Handbook, Xanathar's Guide to Everything, or Tasha's Cauldron of Everything. Spells granted by a Planar Path's Additional Spells are not part of this list and are always prepared for shamans of that path.</p>
+
+      <div class="spell-level-group">
+        <div class="spell-level-label">1st Level</div>
+        <p class="spell-tags">absorb elements, beast bond, comprehend languages, detect magic, fog cloud, jump, longstrider, speak with animals, thunderwave, <b>Veil of Whispers</b><span class="new-spell-pill">NEW</span></p>
+      </div>
+      <div class="spell-level-group">
+        <div class="spell-level-label">2nd Level</div>
+        <p class="spell-tags">conjure animals, gust of wind, lesser restoration, locate animals or plants, misty step, protection from poison, summon beast, warding wind, <b>Probability Thread</b><span class="new-spell-pill">NEW</span></p>
+      </div>
+      <div class="spell-level-group">
+        <div class="spell-level-label">3rd Level</div>
+        <p class="spell-tags">conjure barrage, dispel magic, protection from energy, spirit guardians (radiant or necrotic only), summon fey, wind wall, <b>Veil Shift</b><span class="new-spell-pill">NEW</span></p>
+      </div>
+      <div class="spell-level-group">
+        <div class="spell-level-label">4th Level</div>
+        <p class="spell-tags">conjure woodland beings, dimension door, elemental bane, freedom of movement, stoneskin</p>
+      </div>
+      <div class="spell-level-group">
+        <div class="spell-level-label">5th Level</div>
+        <p class="spell-tags">commune (ritual), conjure elemental, contact other plane (ritual), planar binding, summon celestial, teleportation circle</p>
+      </div>
+
+      <h3 class="feat-h" style="margin-top:50px;">New Spells</h3>
+
+      <div class="spell-card">
+        <h4>Veil of Whispers</h4>
+        <div class="spell-meta-line">2nd-level enchantment</div>
+        <div class="spell-stats">
+          <span><b>Casting Time:</b> 1 action</span>
+          <span><b>Range:</b> 60 feet</span>
+          <span><b>Components:</b> V, S</span>
+          <span><b>Duration:</b> Concentration, up to 1 minute</span>
+        </div>
+        <p>You weave subtle planar threads around a creature you can see within range. The target must succeed on a Wisdom saving throw or be affected by one of the following effects of your choice; willing creatures automatically succeed.</p>
+        <ul class="feat-list">
+          <li>The target has disadvantage on Charisma checks and Charisma saving throws for the duration.</li>
+          <li>The target has advantage on Charisma checks and Charisma saving throws for the duration (this can affect allies).</li>
+          <li>The target becomes charmed by you or by one creature of your choice for the duration. If the target takes damage, the effect ends immediately.</li>
+        </ul>
+        <p><b>At Higher Levels.</b> When you cast this spell using a spell slot of 3rd level or higher, you can target one additional creature for each slot level above 2nd.</p>
+      </div>
+
+      <div class="spell-card">
+        <h4>Probability Thread</h4>
+        <div class="spell-meta-line">2nd-level transmutation</div>
+        <div class="spell-stats">
+          <span><b>Casting Time:</b> 1 action</span>
+          <span><b>Range:</b> 60 feet</span>
+          <span><b>Components:</b> V, S</span>
+          <span><b>Duration:</b> Concentration, up to 1 minute</span>
+        </div>
+        <p>Choose one creature you can see within range. The next time it makes an attack roll, saving throw, or ability check before the spell ends, you may force it to reroll and take the lower or higher result, your choice. The creature is aware that a thread of fate was tugged.</p>
+      </div>
+
+      <div class="spell-card">
+        <h4>Veil Shift</h4>
+        <div class="spell-meta-line">3rd-level conjuration</div>
+        <div class="spell-stats">
+          <span><b>Casting Time:</b> 1 bonus action</span>
+          <span><b>Range:</b> Self</span>
+          <span><b>Components:</b> V, S</span>
+          <span><b>Duration:</b> 1 round</span>
+        </div>
+        <p>You step into the Border Ethereal or the Astral Plane until the start of your next turn. While there, you are invisible and intangible to creatures on the Material Plane and cannot be targeted by spells or attacks from them. You may move normally but cannot interact with the Material Plane. At the start of your next turn, you return to an unoccupied space you can see within 60 feet.</p>
+      </div>
+
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PLANAR ORIGINS PANEL                                          -->
+    <!-- ============================================================ -->
+    <section class="panel" id="panel-origins">
+      <h2 class="section-title">Planar Origins</h2>
+      <p class="section-flavor">A reference for every shaman feature that refers to a creature "of planar origin," an "extraplanar" creature, or an "extraplanar influence." Use this tab to resolve any ruling on Mystical Awareness, Spiritual Insight, Planar Attunement, and the several Planar Path features that key off these terms.</p>
+
+      <div class="callout violet">
+        <div class="callout-title">The Governing Rule</div>
+        <p>A creature counts as <b>of planar origin</b> (equivalently, <b>extraplanar</b>) if its statistics give it one of the following creature types: <b>aberration, celestial, elemental, fey,</b> or <b>fiend.</b> This is true regardless of which plane the creature currently occupies — a fiend encountered on the Material Plane is still of planar origin, and a fey-blooded creature born on the Material Plane is not, unless its creature type is actually fey. Creature type is the only thing that matters; ancestry, birthplace, and appearance are not.</p>
+      </div>
+
+      <h3 class="feat-h">The Five Qualifying Types</h3>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Typical Examples</th><th>Native Planes</th></tr></thead>
+          <tbody>
+            <tr><td><b>Aberration</b></td><td>Aboleths, gibbering mouthers, mind flayers, chuuls, beholders</td><td>The Far Realm and other planes alien to ordinary reality</td></tr>
+            <tr><td><b>Celestial</b></td><td>Angels, couatls, pegasi, unicorns, devas</td><td>The Upper Planes (Celestia, Elysium, Mount Celestia, and similar)</td></tr>
+            <tr><td><b>Elemental</b></td><td>Elementals of all four classical types, genies (dao, djinn, efreet, marid), salamanders, invisible stalkers</td><td>The Elemental Planes and the Elemental Chaos</td></tr>
+            <tr><td><b>Fey</b></td><td>Dryads, satyrs, pixies, hags, sprites, blink dogs</td><td>The Feywild</td></tr>
+            <tr><td><b>Fiend</b></td><td>Demons, devils, yugoloths, imps, hell hounds, rakshasas</td><td>The Lower Planes (the Abyss, the Nine Hells, Gehenna, and similar)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="feat-h">Named Exceptions</h3>
+      <p>The following cases come up often enough at the table that they're worth stating explicitly rather than leaving to interpretation.</p>
+
+      <ul class="feat-list">
+        <li><b>Undead are not extraplanar.</b> Zombies, skeletons, ghosts, vampires, liches, and all other undead are excluded from this definition, even those native to or strongly associated with the Shadowfell. Undead are a Material Plane death-state, not a planar lineage. The one common exception already resolves itself under the governing rule: a shadow demon or other undead-flavored fiend is of planar origin because its creature type is fiend, not because it is undead-presenting.</li>
+        <li><b>Planetouched humanoids do not qualify.</b> Tieflings, aasimar, and similar lineages with a documented extraplanar ancestor are humanoids by creature type in this game, not fiends, celestials, or fey. A shaman's Planar Intuition bonus does not apply to a conversation with a tiefling merchant, regardless of how infernal their bloodline might be. If your table prefers otherwise, this is a reasonable and clearly-flagged house rule, but it is not the default.</li>
+        <li><b>Constructs are not extraplanar</b>, even when built or animated using planar energy (a homunculus bound by a fire elemental spirit is still a construct, not an elemental), unless a specific creature's stat block actually lists its type as something other than construct.</li>
+        <li><b>Genies and other elemental nobility qualify automatically</b> as elementals; no separate ruling is needed for dao, djinn, efreet, or marid.</li>
+        <li><b>Modrons, slaadi, and similar plane-specific monstrosities</b> are already covered by their listed creature type (most are aberrations or elementals depending on source material) and require no special-case ruling.</li>
+        <li><b>Shapechanged or polymorphed creatures</b> use their current form's creature type for the duration of the effect. A fiend that uses a spell or ability to become a Tiny beast is not currently a fiend, and Planar Intuition does not apply to interactions with it while transformed.</li>
+      </ul>
+
+      <h3 class="feat-h">Non-Creature Extraplanar Influences</h3>
+      <p>Mystical Awareness grants advantage on checks to "recognize extraplanar influences," which covers more than just creatures. Use the following as a guide for what qualifies:</p>
+      <ul class="feat-list">
+        <li>Active portals, planar rifts, or unstable seams between the Material Plane and another plane.</li>
+        <li>Residual traces left behind by planar travel — the lingering "wrongness" of a spot where a gate, plane shift, or similar spell was recently cast.</li>
+        <li>Localized bleed-through of a plane's native traits into the Material Plane (a patch of ground that behaves as if it were on the Shadowfell, a pocket of air that carries the Feywild's heightened emotion, and similar effects).</li>
+        <li>Magic items, locations, or phenomena explicitly described as extraplanar in origin, even if no creature is currently present.</li>
+      </ul>
+      <p>This category does not extend to ordinary magic, even powerful magic, that does not involve another plane. A wizard's fireball is not an extraplanar influence; a devil's at-will spellcasting is, because the devil itself is extraplanar, but the specific spell effect is judged by the same rule as any other spell unless the spell itself interacts with a plane (such as plane shift or gate).</p>
+
+      <div class="callout">
+        <div class="callout-title">Where This Definition Applies</div>
+        <p>This ruling governs every use of "planar origin" or "extraplanar" throughout the shaman class, including: <b>Mystical Awareness</b> (detection and advantage), <b>Spiritual Insight's Planar Intuition</b> (Deception/Insight/Persuasion bonus) and <b>Spirit Whisper</b> (advantage on interaction checks), <b>Planar Attunement's Extraplanar Senses</b>, and any Planar Path feature that grants a benefit "against," "involving," or "with" a creature of planar origin — including features in Eternal Elements, Feywild, Shadowfell, Outer Veil, Material Warden, Divine, Winding Ways, Awakened Totem, and Shaman of Sending.</p>
+      </div>
+
+    </section>
+
+  </div>
+</div>
+
+<footer>THE SHAMAN · CONDUITS OF THE PLANES · HOMEBREW CLASS REFERENCE</footer>
+
+<script>
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+
+  function activateTab(name){
+    tabs.forEach(t => {
+      const isActive = t.dataset.tab === name;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => activateTab(t.dataset.tab)));
+
+  document.querySelectorAll('.sub-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const target = document.getElementById(chip.dataset.jump);
+      if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
+    });
+  });
+</script>
+
+</body>
+</html>
